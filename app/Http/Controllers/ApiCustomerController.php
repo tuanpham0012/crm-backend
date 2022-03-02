@@ -18,9 +18,22 @@ class ApiCustomerController extends Controller
      */
     public function index(Request $request)
     {
-        $customers = Customer::with(['CustomerPhone', 'TypeCustomer'])
-            ->where('name', 'like','%'.$request->search.'%')
-            ->orWhere('email', 'like', '%'.$request->search.'%')->latest()->paginate(9);
+        $pageSize = 9;
+        $search = $request->search;
+        if(isset($request->type) && $request->type != -1){
+            $customers = Customer::with(['CustomerPhone', 'TypeCustomer'])
+                ->where(function($query) use ($search){
+                    $query->where('name', 'like','%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%');
+                })->where('type_of_customer_id', $request->type)
+                ->latest()->paginate($pageSize);
+        }else{
+            $customers = Customer::with(['CustomerPhone', 'TypeCustomer'])
+                ->where(function($query) use ($search){
+                    $query->where('name', 'like','%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%');
+                })->latest()->paginate($pageSize);
+        }
         return response()->json($customers, 200);
     }
 
@@ -42,6 +55,11 @@ class ApiCustomerController extends Controller
      */
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'email' => 'required|unique:customers|email',
+            'phone' => 'required|unique:customer_phone',
+        ]);
+
         $customer = new Customer();
         $customer->fill($request->all());
         $customer->customer_code = Str::orderedUuid();
@@ -90,6 +108,11 @@ class ApiCustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $validated = $request->validate([
+            'email' => 'unique:customers|email',
+            'phone' => 'unique:customer_phone',
+        ]);
+        
         $customer = Customer::find($id)->update($request->all());
         $new_phones = $request->customer_phone;
         $del = CustomerPhone::where('customer_id', '=', $id)->delete();

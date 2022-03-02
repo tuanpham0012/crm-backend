@@ -12,6 +12,8 @@ class CustomerPhone extends Model
         'customer_id', 'phone'
     ];
 
+    public $timestamps = false;
+
     public function Customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id', 'id');
