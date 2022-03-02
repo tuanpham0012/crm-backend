@@ -18,9 +18,7 @@ class ApiCustomerController extends Controller
      */
     public function index(Request $request)
     {
-        $customers = Customer::with(['CustomerPhone', 'TypeCustomer'])
-            ->where('name', 'like','%'.$request->search.'%')
-            ->orWhere('email', 'like', '%'.$request->search.'%')->latest()->paginate(9);
+        $customers = Customer::with(['CustomerPhone', 'TypeCustomer'])->latest()->paginate(9);
         return response()->json($customers, 200);
     }
 
