@@ -41,4 +41,19 @@ class User extends Authenticatable
     public function role(){
         return $this->belongsTo('App\Models\role', 'role_id', 'id');
     }
+
+    public function StaffOfDepartment()
+    {
+        return $this->hasOne('App\Models\StaffOfDepartment', 'user_id', 'id');
+    }
+
+    public function Contacts()
+    {
+        return $this->hasMany('App\Models\Contacts', 'user_id', 'id');
+    }
+
+    public function CustomerNotes()
+    {
+        return $this->hasMany('App\Models\CustomerNotes', 'user_id', 'id');
+    }
 }

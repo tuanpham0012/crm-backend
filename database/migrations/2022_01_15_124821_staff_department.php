@@ -16,7 +16,7 @@ class StaffDepartment extends Migration
         Schema::create('staff_department', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('department_id');
-            $table->integer('staff_id');
+            $table->integer('user_id');
             $table->integer('position_id');
             $table->timestamps();
         });

@@ -17,7 +17,6 @@ class CustomerPhone extends Migration
             $table->bigIncrements('id');
             $table->integer('customer_id');
             $table->string('phone');
-            $table->timestamps();
         });
     }
 

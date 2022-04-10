@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class Position extends Migration
+class CreateProductPricesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class Position extends Migration
      */
     public function up()
     {
-        Schema::create('position', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('position');
+        Schema::create('product_prices', function (Blueprint $table) {
+            $table->id();
+            $table->integer('product_id');
+            $table->integer('price');
+            $table->timestamps();
         });
     }
 
@@ -26,6 +28,6 @@ class Position extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('position');
+        Schema::dropIfExists('product_prices');
     }
 }

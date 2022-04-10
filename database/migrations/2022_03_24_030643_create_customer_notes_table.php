@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class Interest extends Migration
+class CreateCustomerNotesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,13 @@ class Interest extends Migration
      */
     public function up()
     {
-        Schema::create('interrest', function (Blueprint $table) {
-            $table->bigIncrements('id');
+        Schema::create('customer_notes', function (Blueprint $table) {
+            $table->id();
+            $table->integer('user_id');
             $table->integer('customer_id');
-            $table->string('type_of_product_id');
+            $table->text('content');
+            $table->boolean('deleted');
+            $table->timestamps();
         });
     }
 
@@ -27,6 +30,6 @@ class Interest extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('interrest');
+        Schema::dropIfExists('customer_notes');
     }
 }

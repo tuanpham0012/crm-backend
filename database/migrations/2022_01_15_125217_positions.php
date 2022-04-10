@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class Interest extends Migration
+class Positions extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class Interest extends Migration
      */
     public function up()
     {
-        Schema::create('interrest', function (Blueprint $table) {
+        Schema::create('positions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('customer_id');
-            $table->string('type_of_product_id');
+            $table->string('position_code')->unique();
+            $table->string('position');
         });
     }
 
@@ -27,6 +27,6 @@ class Interest extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('interrest');
+        Schema::dropIfExists('positions');
     }
 }

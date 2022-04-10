@@ -18,7 +18,10 @@ class Products extends Migration
             $table->string('code_product');
             $table->string('name');
             $table->integer('type_of_product_id');
-            $table->integer('price');
+            $table->string('origin');
+            $table->string('unit');
+            $table->text('describe');
+            $table->integer('VAT');
             $table->timestamps();
         });
     }

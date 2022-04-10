@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\CustomerPhone;
-use App\Models\typeCustomer;
 
 class Customer extends Model
 {
@@ -16,10 +14,20 @@ class Customer extends Model
 
     public function CustomerPhone()
     {
-        return $this->hasMany(CustomerPhone::class, 'customer_id', 'id');
+        return $this->hasMany('App\Models\CustomerPhone', 'customer_id', 'id');
+    }
+
+    public function Contacts()
+    {
+        return $this->hasOne('App\Models\Contacts', 'customer_id', 'id');
+    }
+
+    public function CustomerNotes()
+    {
+        return $this->hasMany('App\Models\CustomerNotes', 'customer_id', 'id')->latest();
     }
 
     public function TypeCustomer(){
-        return $this->belongsTo(typeCustomer::Class, 'type_of_customer_id', 'id');
+        return $this->belongsTo('App\Models\TypeCustomer', 'type_of_customer_id', 'id');
     }
 }
