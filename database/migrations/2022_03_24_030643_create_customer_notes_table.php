@@ -18,7 +18,7 @@ class CreateCustomerNotesTable extends Migration
             $table->integer('user_id');
             $table->integer('customer_id');
             $table->text('content');
-            $table->boolean('deleted');
+            $table->boolean('deleted')->default(0);
             $table->timestamps();
         });
     }

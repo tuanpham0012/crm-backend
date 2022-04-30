@@ -22,10 +22,9 @@ class Customers extends Migration
             $table->string('gender')->nullable();
             $table->date('date_of_birth')->nullable();
             $table->string('zalo')->nullable();
-            $table->string('facebook')->nullable();
             $table->integer('type_of_customer_id')->nullable();
             $table->integer('status')->nullable();
-            $table->integet('user_id')->nullable();
+            $table->integer('user_id')->nullable()->comment('Người tạo');
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

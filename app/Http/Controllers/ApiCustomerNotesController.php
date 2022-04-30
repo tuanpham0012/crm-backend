@@ -36,7 +36,7 @@ class ApiCustomerNotesController extends Controller
     public function store(Request $request)
     {
         $note = CustomerNotes::create($request->all());
-        return response()->json($msg = "Tạo mới thành công!", 200);
+        return response()->json(['message' => 'Thêm ghi chú khách hàng thành công!', 'customer_id' => $note->customer_id], 200);
 
     }
 
@@ -72,7 +72,13 @@ class ApiCustomerNotesController extends Controller
     public function update(Request $request, $id)
     {
         $note = CustomerNotes::find($id)->update($request->all());
-        return response()->json($msg = 'Chỉnh sửa thành công!', 200);
+        $customer_id = CustomerNotes::find($id);
+        if($note){
+            return response()->json(['message' => 'Chỉnh sửa thành công!', 'customer_id' => $customer_id->id], 200);
+        }else{
+            return response()->json(['message' => 'Không tìm thấy bản ghi!'], 404);
+        }
+       
     }
 
     /**
@@ -83,7 +89,11 @@ class ApiCustomerNotesController extends Controller
      */
     public function destroy($id)
     {
-        $note = CustomerNotes::find($id)->delete();
-        return response()->json($msg = 'Xóa thành công!', 200);
+            $note = CustomerNotes::find($id)->delete();
+            if($note){
+                return response()->json(['message' => 'Xóa thành công!'], 200);
+            }else{
+                return response()->json(['message' => 'Không tìm thấy bản ghi!'], 404);
+            }
     }
 }

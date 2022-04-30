@@ -30,4 +30,8 @@ class Customer extends Model
     public function TypeCustomer(){
         return $this->belongsTo('App\Models\TypeCustomer', 'type_of_customer_id', 'id');
     }
+
+    public function Interest(){
+        return $this->hasMany('App\Models\Interest', 'customer_id', 'id');
+    }
 }

@@ -59,6 +59,6 @@ class ApiUserController extends Controller
     }
 
     public function userInfo(Request $request){
-        return response()->json($request->user('api')->load(['role', 'StaffOfDepartment.departments']));
+        return response()->json($request->user('api')->load(['Role', 'StaffOfDepartment.departments']));
     }
 }
