@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 use App\Http\Requests\ApiRegisterRequest;
 use App\Http\Requests\ApiLoginRequest;
 use App\Http\Requests\ApiChangePasswordRequest;
-
+use DateTime;
 
 class ApiUserController extends Controller
 {
@@ -25,7 +25,7 @@ class ApiUserController extends Controller
     }
 
     public function login(ApiLoginRequest $request){
-        $user = User::with('role')->whereEmail($request->email)->first();
+        $user = User::whereEmail($request->email)->first();
         if($user){
             if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
                 $user->token = $user->createToken('App')->accessToken;
@@ -36,7 +36,6 @@ class ApiUserController extends Controller
         }else{
             return response()->json(['message' => 'Tài khoản không tồn tại!'],404);
         }
-        
     }
 
     public function changePassword(ApiChangePasswordRequest $request){
@@ -59,6 +58,23 @@ class ApiUserController extends Controller
     }
 
     public function userInfo(Request $request){
-        return response()->json($request->user('api')->load(['Role', 'StaffOfDepartment.departments']));
+        $user = User::find($request->user('api')->id);
+        if($user){
+            $user->last_login = new DateTime();
+            $user->save();
+        }
+        return response()->json($request->user('api')->load(['Role', 'StaffOfDepartment.departments:id,name','StaffOfDepartment.position:id,position']));
+    }
+
+    public function getDownload()
+    {
+    //PDF file is stored under project/public/download/info.pdf
+    $file= public_path(). "/downloads/DataCustomer.xlsx";
+
+    $headers = [
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+     ];
+
+        return response()->download($file, 'DataCustomer.xlsx', $headers);
     }
 }

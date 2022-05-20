@@ -175,6 +175,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        Maatwebsite\Excel\ExcelServiceProvider::class,
+
     ],
 
     /*
@@ -229,6 +231,7 @@ return [
 
         'Helper' => App\Helper\Helper::class,
 
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ],
 
 ];

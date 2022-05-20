@@ -2,10 +2,10 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\Warehouse;
+use App\Models\ProjectStatus;
 use Faker\Generator as Faker;
 
-$factory->define(Warehouse::class, function (Faker $faker) {
+$factory->define(ProjectStatus::class, function (Faker $faker) {
     return [
         //
     ];

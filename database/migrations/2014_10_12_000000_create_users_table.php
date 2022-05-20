@@ -22,9 +22,12 @@ class CreateUsersTable extends Migration
             $table->string('date_of_birth')->nullable();
             $table->string('address')->nullable();
             $table->string('home_town')->nullable();
+            $table->string('nationality')->nullable();
+            $table->string('religion')->nullable();
             $table->string('gender')->nullable();
             $table->string('ethnic')->nullable();
             $table->string('cmnd')->nullable();
+            $table->string('cmnd_address')->nullable()->comment('Nơi cấp cmnd');
             $table->string('status')->nullable();
             $table->string('avatar')->nullable();
             $table->timestamp('last_login')->nullable();
@@ -32,6 +35,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->integer('role_id')->default('3');
             $table->string('note')->nullable();
+            $table->boolean('deleted')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

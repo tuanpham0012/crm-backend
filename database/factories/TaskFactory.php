@@ -18,5 +18,7 @@ $factory->define(Task::class, function (Faker $faker) {
         'user_id' => 1,
         'customer_id' => null,
         'task_status_id' => TaskStatus::query()->inRandomOrder()->value('id'),
+        'created_at' => new DateTime,
+        'updated_at' => new DateTime,
     ];
 });

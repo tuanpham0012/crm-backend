@@ -30,7 +30,7 @@ class CreateAdmin extends Seeder{
             'email_verified_at' => now(),
             'phone' => '0983776901',
             'date_of_birth' => '',
-            'gender' => 'male',
+            'gender' => 'Nam',
             'status' => '',
             'password' => Hash::make('admin123'),
             'role_id' => 1,
@@ -46,7 +46,7 @@ class AddStaff extends Seeder{
             DB::table('staff_department')->insert([
                 'department_id' => Department::query()->inRandomOrder()->value('id'),
                 'user_id' => $user->id,
-                'position_id' => 1
+                'position_id' => 3
             ]);
         }
     }

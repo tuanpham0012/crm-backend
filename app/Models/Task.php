@@ -9,9 +9,7 @@ class Task extends Model
 {
     protected $table = 'tasks';
     protected $fillable = [
-        'name', 'start', 'end', 'content', 'type_of_task_id', 'user_id'
-        ,'customer_id'
-        ,'task_status_id'
+        'name', 'start', 'end', 'content', 'type_of_task_id', 'user_id', 'customer_id', 'task_status_id', 'project_id'
     ];
 
     public function TypeOfTask(){
@@ -31,5 +29,8 @@ class Task extends Model
     }
     public function NoteOfTask(){
         return $this->hasMany('App\Models\NoteOfTask')->latest();
+    }
+    public function Project(){
+        return $this->belongsTo('App\Models\Projects', 'project_id', 'id');
     }
 }

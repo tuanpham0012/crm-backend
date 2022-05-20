@@ -18,15 +18,19 @@ class DepartmentSeeder extends Seeder
             ],
             [
                 'code_department' => 'PBSL',
-                'name' => 'Phòng kinh doanh'
+                'name' => 'Phòng nhân sự'
             ],
             [
                 'code_department' => 'PPMK',
-                'name' => 'Phòng tiếp thị'
+                'name' => 'Phòng kế toán'
             ],
             [
                 'code_department' => 'PPCS',
                 'name' => 'Phòng chăm sóc khách hàng'
+            ],
+            [
+                'code_department' => 'PPKD',
+                'name' => 'Phòng kinh doanh'
             ]
         ]);
     }

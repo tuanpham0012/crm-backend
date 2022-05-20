@@ -14,10 +14,12 @@ class TaskStatusSeeder extends Seeder
     public function run()
     {
         DB::table('task_statuses')->insert([
-            ['status' => 'Mới'],
+            ['status' => 'Thêm mới'],
+            ['status' => 'Đang tiến hành'],
             ['status' => 'Chậm tiến độ'],
             ['status' => 'Hoàn thành muộn'],
             ['status' => 'Hoàn thành'],
+            ['status' => 'Đã hủy'],
         ]);
     }
 }

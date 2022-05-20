@@ -35,7 +35,13 @@ class CustomerCallHistoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $contact = new CustomerCallHistory();
+        $contact->fill($request->all());
+        $contact->user_id = $request->user('api')->id;
+        $contact->call_status_id = 1;
+        $contact->save();
+
+        return response()->json(['message' => 'Success', 'contact' => $contact], 200);
     }
 
     /**

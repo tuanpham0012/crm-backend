@@ -19,11 +19,19 @@ class PossitionSeeder extends Seeder
             ],
             [
                 'position_code' => 'PTP',
-                'position' => 'Phó trưởng phòng'
+                'position' => 'Phó phòng'
             ],
             [
                 'position_code' => 'NV',
                 'position' => 'Nhân viên'
+            ],
+            [
+                'position_code' => 'CTV',
+                'position' => 'Cộng tác viên'
+            ],
+            [
+                'position_code' => 'TTS',
+                'position' => 'Thực tập sinh'
             ],
         ]);
     }

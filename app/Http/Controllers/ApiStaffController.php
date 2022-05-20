@@ -9,7 +9,7 @@ use App\Models\StaffOfDepartment;
 class ApiStaffController extends Controller
 {
     public function getStaffs(){
-        $user = User::with(['Contacts'])->latest()->paginate(10);
+        $user = User::with(['StaffOfDepartment.Departments',])->latest()->paginate(10);
         return response()->json($user, 200);
     }
     public function getStaffForDepartment(Request $request){

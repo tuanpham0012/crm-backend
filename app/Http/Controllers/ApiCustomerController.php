@@ -2,19 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Helper\Helper;
 use App\User;
+use DateTime;
+use App\Models\Task;
+use App\Helper\Helper;
+use App\Mail\SendMail;
 use App\Models\Contacts;
-use App\Models\Customer;
-use App\Models\TypeProduct;
-use Illuminate\Support\Str;
-use App\Models\typeCustomer;
 
-use Illuminate\Http\Request;
-use App\Models\CustomerNotes;
-use App\Models\CustomerPhone;
+use App\Models\Customer;
 use App\Models\Interest;
-use PHPUnit\TextUI\Help;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use App\Models\TypeCustomer;
+use Illuminate\Http\Request;
+use App\Models\CustomerPhone;
+use App\Models\SendMailHistory;
+use App\Imports\CustomersImport;
+use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ApiCustomerController extends Controller
 {
@@ -27,24 +32,18 @@ class ApiCustomerController extends Controller
     {
         $pageSize = 20;
         $search = $request->search;
-        if(isset($request->type) && $request->type != -1){
-            $customers = Customer::with(['CustomerPhone', 'TypeCustomer', 'Contacts.User', 'CustomerNotes.User'])
+        $customers = Customer::with(['CustomerPhone', 'TypeCustomer', 'Contacts.User', 'CustomerNotes.User', 'User'])
                 ->where(function($query) use ($search){
                     $query->where('name', 'like','%'.$search.'%')
                         ->orWhere('email', 'like', '%'.$search.'%');
-                })->where('type_of_customer_id', $request->type)
+                })->where(function($q) use($request){
+                    if(isset($request->type) && $request->type != -1 ) $q->where('type_of_customer_id', $request->type);
+                })
+                ->where(function($q) use($request){
+                    if($request->delete != -1) $q->where('deleted', $request->delete);
+                })
                 ->latest()->paginate($pageSize);
-        }else{
-            $customers = Customer::with(['CustomerPhone', 'TypeCustomer', 'Contacts.User', 'CustomerNotes.User'])
-                ->where(function($query) use ($search){
-                    $query->where('name', 'like','%'.$search.'%')
-                        ->orWhere('email', 'like', '%'.$search.'%');
-                })->latest()->paginate($pageSize);
-        }
-        $type_of_product = TypeProduct::get();
-        $type_of_customer = typeCustomer::get();
-
-        return response()->json([ 'customers' => $customers, 'type_of_product' => $type_of_product, 'type_of_customer' => $type_of_customer], 200);
+        return response()->json([ 'customers' => $customers], 200);
     }
 
     /**
@@ -100,7 +99,13 @@ class ApiCustomerController extends Controller
      */
     public function show($id)
     {
-        $customer = Customer::with(['CustomerPhone', 'TypeCustomer', 'Contacts.User','CustomerNotes.User', 'Interest.TypeOfProduct'])->find($id);
+        $customer = Customer::with([
+            'CustomerPhone', 'TypeCustomer', 'Contacts.User','CustomerNotes.User', 
+            'Interest.TypeOfProduct', 'Tasks.User', 'Tasks.TaskStatus', 
+            'Tasks.TypeOfTask', 'Tasks.TaskUser',
+            'SendMailHistories.User',
+            'CallHistories.User'
+            ])->find($id);
         if($customer){
             return response()->json($customer, 200);
         }else{
@@ -132,7 +137,10 @@ class ApiCustomerController extends Controller
         //     'email' => 'unique:customers|email',
         //     'phone' => 'unique:customer_phone',
         // ]);
-        $customer = Customer::find($id)->update($request->all());
+        $customer = Customer::find($id);
+        $customer->fill($request->all());
+        $customer->save();
+        
         $new_phones = $request->customer_phone;
         $del = CustomerPhone::where('customer_id', '=', $id)->get();
         if($del){ 
@@ -164,41 +172,89 @@ class ApiCustomerController extends Controller
     }
 
     public function assign_sale(Request $request){
-            foreach($request->selected as $customer_id){
-                $contact = Contacts::where('customer_id', $customer_id)->first();
-                if(isset($contact)){
-                    if($request->update)
-                        $contact->user_id = $request->id;
-                        $contact->save();
-                }else{
-                    $newCt = new Contacts;
-                    $newCt->user_id = $request->id;
-                    $newCt->customer_id = $customer_id;
-                    $newCt->save();
+            $user = User::find($request->user_id);
+            if(isset($user)){
+                foreach($request->listCustomer as $customer_id){
+                    $customer = Customer::find($customer_id);
+                    if($customer){
+                        $contact = Contacts::where('customer_id', $customer_id)->first();
+                        $title = 'Khách hàng';
+                        $content1 = "<span class='span-name'>".$request->user('api')->name ."</span> chỉ định bạn phụ trách khách hàng <span class='span-name'>".$customer->name."</span>"; 
+                        $relation = "customer";
+                        $relation_id = $customer_id;
+                        if(isset($contact)){
+                            if($request->update){
+                                $contact->user_id = $request->user_id;
+                                $contact->save();
+                            }
+                        }else{
+                            $newCt = new Contacts;
+                            $newCt->user_id = $request->user_id;
+                            $newCt->customer_id = $customer_id;
+                            $newCt->save();
+                        }
+                        Helper::CreateNotification($title, $content1, $request->user_id,$relation, $relation_id);
+                        
+                        $content = 'Gán <span class="span-name">'. $user->name .'</span> làm người phụ trách';
+                        Helper::CreateNoteOfCustomer($customer_id, $request->user('api')->id, $content);
+                    }
+                    
                 }
-                $user = User::find($request->id);
-                $content = 'Gán <span style="font-size:1.05rem;font-weight:bold;"'.$user->name.'</span> làm người phụ trách';
-                Helper::CreateNoteOfCustomer($customer_id, $request->user('api')->id, $content);
             }
-        return response()->json($msg = 'Cập nhật khách hàng thành công!', 200);
+        return response()->json(['message' => 'Cập nhật khách hàng thành công!', 'name' => $user->name], 200);
+    }
+
+    public function update_type(Request $request){
+        foreach($request->listCustomer as $customer_id){
+            $customer = Customer::find($customer_id);
+            if($customer){
+                $type = TypeCustomer::find($request->type);
+                if($type){
+                    $customer->type_of_customer_id = $request->type;
+                    $customer->save();
+                    $content = '<span class="span-name">'. $request->user('api')->name .'</span> cập nhật quan hệ khách hàng thành <span class="span-name">' .$type->type . '</span>';
+                    Helper::CreateNoteOfCustomer($customer_id, $request->user('api')->id, $content);
+                }
+            }
+        }
+    return response()->json(['message' => 'Cập nhật khách hàng thành công!'], 200);
+    }
+
+    public function multiple_delete(Request $request){
+        foreach($request->listCustomer as $customer_id){
+            $customer = Customer::find($customer_id);
+            if($customer){
+                if(!$customer->deleted){
+                    $customer->deleted = 1;
+                    $customer->save();
+                    $content = '<span class="span-name">'. $request->user('api')->name .'</span> đã xóa khách hàng';
+                    Helper::CreateNoteOfCustomer($customer_id, $request->user('api')->id, $content);
+                }else{
+                    $customer->delete();
+                }
+            }
+        }
+    return response()->json(['message' => 'Xóa khách hàng thành công!'], 200);
     }
 
     public function my_list_customer(Request $request){
         $pageSize = 20;
-        if(isset($request->type) && $request->type == -1){
-            $customers = Contacts::where('user_id', $request->user('api')->id)
-            ->with(['Customer', 'Customer.CustomerPhone', 'Customer.TypeCustomer'])
-            ->whereHas('Customer', function($q) use ($request){
-                $q->where('name', 'like', '%'.$request->search.'%');
-            })->latest()->paginate($pageSize);
-        }else{
-            $customers = Contacts::where('user_id', $request->user('api')->id)
-                        ->with(['Customer', 'Customer.CustomerPhone', 'Customer.TypeCustomer'])
-                        ->whereHas('Customer', function($q) use ($request){
-                            $q->where('name', 'like', '%'.$request->search.'%')->where('type_of_customer_id',$request->type);
-                        })->latest()->paginate($pageSize);
-        }
-        return response()->json($customers, 200);
+        $search = $request->search;
+        $customers = Customer::with(['CustomerPhone', 'TypeCustomer', 'Contacts.User', 'CustomerNotes.User', 'User'])
+                ->where(function($query) use ($search){
+                    $query->where('name', 'like','%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%');
+                })->where(function($q) use($request){
+                    if(isset($request->type) && $request->type != -1 ) $q->where('type_of_customer_id', $request->type);
+                })
+                ->where(function($q) use($request){
+                    if($request->delete != -1) $q->where('deleted', $request->delete);
+                })->whereHas('Contacts', function($q) use($request){
+                    return $q->where('user_id', $request->user('api')->id);
+                })
+                ->latest()->paginate($pageSize);
+
+        return response()->json([ 'customers' => $customers], 200);
     }
 
     public function search_customer_code(Request $request){
@@ -208,7 +264,6 @@ class ApiCustomerController extends Controller
         }else{
             return response()->json(['msg' => 'Không tìm thấy thông tin khách hàng'], 404);
         }
-        
     }
 
     public function updateCustomerInterest(Request $request){
@@ -224,4 +279,75 @@ class ApiCustomerController extends Controller
         }
         return response()->json(['message' => 'Cập nhật thành công!'], 200);
     }
+
+    public function get_task(Request $request, $id){
+        $date = new DateTime;
+        $id = $request->user('api')->id;
+
+        Task::where('end', '<', $date)->whereNotIn('task_status_id', [4, 5, 6])->update(['task_status_id' => 3]);
+        Task::where('start', '<=', $date)->where( 'end', '>=', $date)->whereNotIn('task_status_id', [4, 5, 6])->update(['task_status_id' => 2]);
+        $new = Task::with(['User', 'TypeOfTask', 'TaskUser', 'TaskUser.User', 'TaskStatus'])
+            ->where('task_status_id', '=', 1)->where('name', 'like', '%'.$request->search.'%')
+            ->whereHas('TaskUser', function($q) use($id){
+                    return $q->where('user_id', $id);})->latest()->get();
+        $progress = Task::with(['User', 'TypeOfTask', 'TaskUser', 'TaskUser.User', 'TaskStatus'])
+                    ->whereIn('task_status_id', [2, 3])->where('name', 'like', '%'.$request->search.'%')
+                    ->whereHas('TaskUser', 
+                        function($q) use ($id){
+                            return $q->where('user_id', $id);
+                    })->latest()->get();
+        $late = Task::with(['User', 'TypeOfTask', 'TaskUser', 'TaskUser.User', 'TaskStatus'])
+            ->where('task_status_id', '=', 3)->where('name', 'like', '%'.$request->search.'%')
+            ->whereHas('TaskUser', 
+                function($q) use ($id){
+                    return $q->where('user_id', $id);
+                    })->latest()->get();
+        $finish = Task::with(['User', 'TypeOfTask', 'TaskUser', 'TaskUser.User', 'TaskStatus'])
+            ->whereIn('task_status_id', [4, 5])->where('name', 'like', '%'.$request->search.'%')
+            ->whereHas('TaskUser',
+                function($q) use ($id){
+                    return $q->where('user_id', $id);
+                    })->latest()->get();
+        $creater = Task::with(['User', 'TypeOfTask', 'TaskUser', 'TaskUser.User', 'TaskStatus'])
+            ->where('user_id', $id)->where('name', 'like', '%'.$request->search.'%')
+            ->latest()->get();
+
+        return response()->json([ 
+            'progress' => $progress, 
+            'late' => $late, 
+            'new_task' => $new, 
+            'creater' => $creater,
+            'finish' => $finish,
+        ], 200);
+    }
+
+    public function send_mail(Request $request){
+        $data = $request->content;
+        $data['sender'] = $request->user('api')->name;
+        $user_id = $request->user('api')->id;
+        foreach($request->listCustomer as $value){
+            $customer = Customer::find($value);
+            if($customer){
+                $email = $customer->email ?? '';
+                
+                $send_mail_history = new SendMailHistory();
+                $send_mail_history->user_id = $user_id;
+                $send_mail_history->title = $data['title'];
+                $send_mail_history->content = $data['content'];
+                $send_mail_history->customer_id = $value;
+                $send_mail_history->to_email = $email;
+                $send_mail_history->save();
+                Mail::to($email)->send(new SendMail($data));
+            }
+        }
+        return response()->json(['message' =>'Gửi thành công!'], 200);
+    }
+
+    public function create_customer_excel(Request $request){
+        $fileName = $request->file('list-customer')->getRealPath();
+        Excel::import(new CustomersImport, $fileName);
+        return response()->json(['message' => 'Thêm mới thành công!'], 200);
+    }
+
+
 }

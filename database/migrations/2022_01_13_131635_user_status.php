@@ -15,7 +15,7 @@ class UserStatus extends Migration
     {
         Schema::create('user_status', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->String('status');
+            $table->string('status');
         });
     }
 

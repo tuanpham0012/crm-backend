@@ -22,7 +22,7 @@ class CreateCustomerCallHistoriesTable extends Migration
             $table->string('content')->nullable();
             $table->string('link_record')->nullable();
             $table->text('note')->nullable();
-            $table->integer('call_status_id');
+            $table->string('status');
             $table->timestamps();
         });
     }

@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class TeamsSeeder extends Seeder
+class ProjectParticipantSeeder extends Seeder
 {
     /**
      * Run the database seeds.

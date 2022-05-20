@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWarehouselistsTable extends Migration
+class CreateProjectParticipantsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateWarehouselistsTable extends Migration
      */
     public function up()
     {
-        Schema::create('warehouse_list', function (Blueprint $table) {
+        Schema::create('project_participants', function (Blueprint $table) {
             $table->id();
-            $table->string('code_warehouse');
-            $table->string('latitude');
-            $table->string('longitude');
-            $table->integer('user_id')->comment('Người quản lí');
+            $table->integer('project_id');
+            $table->integer('user_id');
+            $table->boolean('accept')->default(0);
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreateWarehouselistsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('warehouse_list');
+        Schema::dropIfExists('project_participants');
     }
 }

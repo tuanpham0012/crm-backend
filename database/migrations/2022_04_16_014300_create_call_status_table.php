@@ -15,7 +15,7 @@ class CreateCallStatusTable extends Migration
     {
         Schema::create('call_status', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('status');
         });
     }
 

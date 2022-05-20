@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class WarehouselistSeeder extends Seeder
+class SendMailHistorySeeder extends Seeder
 {
     /**
      * Run the database seeds.

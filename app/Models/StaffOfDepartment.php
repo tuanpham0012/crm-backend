@@ -20,5 +20,9 @@ class StaffOfDepartment extends Model
     {
         return $this->belongsTo('App\User', 'user_id', 'id');
     }
+    public function Position()
+    {
+        return $this->belongsTo('App\Models\Position', 'position_id', 'id');
+    }
 
 }

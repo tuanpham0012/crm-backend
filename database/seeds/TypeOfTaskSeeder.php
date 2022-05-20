@@ -16,7 +16,7 @@ class TypeOfTaskSeeder extends Seeder
             ['type' => 'Gọi điện'],
             ['type' => 'Hẹn gặp'],
             ['type' => 'Gửi mail'],
-            ['type' => 'Nhắn tin'],
+            ['type' => 'Gửi SMS'],
             ['type' => 'Hợp đồng'],
             ['type' => 'Tư vấn'],
             ['type' => 'Hỗ trợ'],

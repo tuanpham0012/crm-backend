@@ -18,11 +18,12 @@ class CreateTasksTable extends Migration
             $table->string('name');
             $table->dateTime('start');
             $table->dateTime('end');
-            $table->string('content');
+            $table->string('content')->nullable();
             $table->integer('type_of_task_id');
             $table->integer('user_id')->comment('Người tạo');
             $table->integer('customer_id')->nullable()->comment('Khách hàng liên quan');
             $table->integer('task_status_id');
+            $table->integer('project_id')->nullable();
             $table->boolean('finish')->default(0);
             $table->timestamps();
         });

@@ -8,7 +8,7 @@ class Customer extends Model
 {
     protected $table = "customers";
     protected $fillable = [
-        'customer_code', 'name', 'email', 'address', 'date_of_birth', 'gender', 'status','note', 'type_of_customer_id', 'deleted',
+        'customer_code', 'name', 'email', 'address', 'date_of_birth', 'gender','note', 'type_of_customer_id', 'user_id', 'deleted',
     ];
 
 
@@ -33,5 +33,21 @@ class Customer extends Model
 
     public function Interest(){
         return $this->hasMany('App\Models\Interest', 'customer_id', 'id');
+    }
+
+    public function Tasks(){
+        return $this->hasMany('App\Models\Task', 'customer_id', 'id');
+    }
+
+    public function User(){
+        return $this->belongsTo('App\User', 'user_id', 'id');
+    }
+
+    public function SendMailHistories(){
+        return $this->hasMany('App\Models\SendMailHistory', 'customer_id', 'id')->latest();
+    }
+
+    public function CallHistories(){
+        return $this->hasMany('App\Models\CustomerCallHistory', 'customer_id', 'id')->latest();
     }
 }

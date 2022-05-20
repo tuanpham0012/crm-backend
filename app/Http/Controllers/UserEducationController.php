@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TeamMembers;
+use App\Models\User_Education;
 use Illuminate\Http\Request;
 
-class TeamMembersController extends Controller
+class UserEducationController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -41,10 +41,10 @@ class TeamMembersController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\TeamMembers  $teamMembers
+     * @param  \App\Models\User_Education  $user_Education
      * @return \Illuminate\Http\Response
      */
-    public function show(TeamMembers $teamMembers)
+    public function show(User_Education $user_Education)
     {
         //
     }
@@ -52,10 +52,10 @@ class TeamMembersController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\TeamMembers  $teamMembers
+     * @param  \App\Models\User_Education  $user_Education
      * @return \Illuminate\Http\Response
      */
-    public function edit(TeamMembers $teamMembers)
+    public function edit(User_Education $user_Education)
     {
         //
     }
@@ -64,10 +64,10 @@ class TeamMembersController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\TeamMembers  $teamMembers
+     * @param  \App\Models\User_Education  $user_Education
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, TeamMembers $teamMembers)
+    public function update(Request $request, User_Education $user_Education)
     {
         //
     }
@@ -75,10 +75,10 @@ class TeamMembersController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\TeamMembers  $teamMembers
+     * @param  \App\Models\User_Education  $user_Education
      * @return \Illuminate\Http\Response
      */
-    public function destroy(TeamMembers $teamMembers)
+    public function destroy(User_Education $user_Education)
     {
         //
     }

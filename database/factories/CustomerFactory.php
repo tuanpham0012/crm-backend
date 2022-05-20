@@ -9,15 +9,14 @@ use Illuminate\Support\Str;
 
 $factory->define(Customer::class, function (Faker $faker) {
     return [
-        'customer_code' => Str::orderedUuid(),
+        'customer_code' => Str::random(10),
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
         'address' => $faker->address,
-        'gender' => 'male',
+        'gender' => 'Nam',
         'date_of_birth' => $faker->date($format = 'Y-m-d', $max = 'now'),
         'zalo' => $faker->e164PhoneNumber,
         'type_of_customer_id' => TypeCustomer::query()->inRandomOrder()->value('id'),
-        'status' => 1,
         'user_id' => 1,
         'deleted' => 0,
         'created_at' => new DateTime,

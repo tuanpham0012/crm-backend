@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Warehouselist;
+use App\Models\SendMailHistory;
 use Illuminate\Http\Request;
 
-class WarehouselistController extends Controller
+class SendMailHistoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -41,10 +41,10 @@ class WarehouselistController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Warehouselist  $warehouselist
+     * @param  \App\Models\SendMailHistory  $sendMailHistory
      * @return \Illuminate\Http\Response
      */
-    public function show(Warehouselist $warehouselist)
+    public function show(SendMailHistory $sendMailHistory)
     {
         //
     }
@@ -52,10 +52,10 @@ class WarehouselistController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Warehouselist  $warehouselist
+     * @param  \App\Models\SendMailHistory  $sendMailHistory
      * @return \Illuminate\Http\Response
      */
-    public function edit(Warehouselist $warehouselist)
+    public function edit(SendMailHistory $sendMailHistory)
     {
         //
     }
@@ -64,10 +64,10 @@ class WarehouselistController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Warehouselist  $warehouselist
+     * @param  \App\Models\SendMailHistory  $sendMailHistory
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Warehouselist $warehouselist)
+    public function update(Request $request, SendMailHistory $sendMailHistory)
     {
         //
     }
@@ -75,10 +75,10 @@ class WarehouselistController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Warehouselist  $warehouselist
+     * @param  \App\Models\SendMailHistory  $sendMailHistory
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Warehouselist $warehouselist)
+    public function destroy(SendMailHistory $sendMailHistory)
     {
         //
     }

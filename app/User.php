@@ -12,12 +12,12 @@ class User extends Authenticatable
     use HasApiTokens,Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that are mass assignable. 'nationality',
      *
      * @var array
      */
     protected $fillable = [
-        'employee_code', 'name', 'email', 'phone', 'date_of_birth', 'gender', 'ethnic', 'cmnd', 'status', 'avatar', 'password', 'role',
+        'employee_code', 'name', 'email', 'address', 'home_town',  'phone', 'date_of_birth', 'gender', 'ethnic', 'cmnd', 'status', 'avatar', 'password', 'role_id', 'note',
     ];
 
     /**
@@ -55,5 +55,10 @@ class User extends Authenticatable
     public function CustomerNotes()
     {
         return $this->hasMany('App\Models\CustomerNotes', 'user_id', 'id');
+    }
+
+    public function Education()
+    {
+        return $this->hasOne('App\Models\UserEducation', 'user_id', 'id');
     }
 }

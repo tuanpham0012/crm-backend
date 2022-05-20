@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             UnitSeeder::class,
             ProductTypeSeeder::class,
             ProductsSeeder::class,
+            ProjectStatusSeeder::class,
             TaskStatusSeeder::class,
             TypeOfTaskSeeder::class,
             TaskSeeder::class,
