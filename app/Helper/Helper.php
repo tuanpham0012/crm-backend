@@ -2,6 +2,7 @@
 namespace App\Helper;
 
 use App\Models\CustomerNotes;
+use App\Models\NoteOfProject;
 use App\Models\NoteOfTask;
 use App\Models\Notification;
 
@@ -18,6 +19,14 @@ class Helper
   public static function CreateNoteOfCustomer($customer_id, $user_id, $content){
     $note = new CustomerNotes();
     $note->customer_id = $customer_id;
+    $note->user_id = $user_id;
+    $note->content = $content;
+    $note->save();
+    return $note;
+  }
+  public static function CreateNoteOfProject($project_id, $user_id, $content){
+    $note = new NoteOfProject();
+    $note->project_id = $project_id;
     $note->user_id = $user_id;
     $note->content = $content;
     $note->save();

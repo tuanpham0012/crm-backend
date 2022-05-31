@@ -24,6 +24,7 @@ class Customers extends Migration
             $table->string('zalo')->nullable();
             $table->integer('type_of_customer_id')->nullable();
             $table->integer('user_id')->nullable()->comment('Người tạo');
+            $table->integer('contact_id')->nullable()->comment('Người phụ trách');
             $table->boolean('deleted')->default(false);
             $table->timestamps();
         });

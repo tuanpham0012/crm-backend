@@ -14,7 +14,6 @@ class RoleSeeder extends Seeder
     {
         DB::table('role')->insert([
             ['role' => 'Quản trị hệ thống'],
-            ['role' => 'Quản lý'],
             ['role' => 'Người dùng']
         ]);
     }

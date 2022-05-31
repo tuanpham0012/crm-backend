@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCustomerReportsTable extends Migration
+class CreateImageUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,10 @@ class CreateCustomerReportsTable extends Migration
      */
     public function up()
     {
-        Schema::create('customer_reports', function (Blueprint $table) {
+        Schema::create('image_users', function (Blueprint $table) {
             $table->id();
-            $table->integer('customer_id');
-            $table->text('content');
-            $table->text('note');
-            $table->string('status');
-            $table->integer('user_id')->comment('Người tiếp nhận');
+            $table->integer('user_id');
+            $table->string('image_link');
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ class CreateCustomerReportsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('customer_reports');
+        Schema::dropIfExists('image_users');
     }
 }

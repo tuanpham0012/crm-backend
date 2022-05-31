@@ -17,6 +17,7 @@ class Departments extends Migration
             $table->bigIncrements('id');
             $table->string('code_department')->unique();
             $table->string('name');
+            $table->string('avatar')->nullable();
         });
     }
 

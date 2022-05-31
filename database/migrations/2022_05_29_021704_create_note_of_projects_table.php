@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCustomerReportsTable extends Migration
+class CreateNoteOfProjectsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateCustomerReportsTable extends Migration
      */
     public function up()
     {
-        Schema::create('customer_reports', function (Blueprint $table) {
+        Schema::create('note_of_projects', function (Blueprint $table) {
             $table->id();
-            $table->integer('customer_id');
+            $table->integer('project_id');
+            $table->integer('user_id')->comment('Người tạo');
             $table->text('content');
-            $table->text('note');
-            $table->string('status');
-            $table->integer('user_id')->comment('Người tiếp nhận');
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ class CreateCustomerReportsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('customer_reports');
+        Schema::dropIfExists('note_of_projects');
     }
 }

@@ -23,9 +23,12 @@ Route::prefix('account')->group(function () {
 });
 Route::get('/home/get_base_data', 'HomeController@get_base_data');
 
+
 Route::middleware('auth:api')->group(function () {
+    Route::get('/home/home_data', 'HomeController@home_data');
     //Nhân viên
     Route::post('/staffs/remove_multiple', 'StaffController@remove_multiple');
+    Route::post('/staffs/update_avatar/{id}', 'StaffController@update_avatar');
     Route::post('/staffs/update_department', 'StaffController@update_department');
     Route::post('/staffs', 'StaffController@index');
     Route::resource('/staff', 'StaffController');
@@ -47,6 +50,7 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('/customer', 'ApiCustomerController');
     Route::resource('/customer_notes', 'ApiCustomerNotesController');
     Route::resource('/contact', 'CustomerCallHistoryController');
+    Route::resource('/cares', 'CustomerReportsController');
     // Công Việc
     Route::post('/tasks/my_task', 'TaskController@get_my_task');
     Route::post('/tasks/accept_task/{id}', 'TaskController@accept_task');
@@ -65,6 +69,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/projects/confirm_participant', 'ProjectsController@confirm_participant');
     Route::post('/projects/delete_participant', 'ProjectsController@delete_participant');
     Route::resource('/projects', 'ProjectsController');
+    Route::resource('/project_note', 'NoteOfProjectController');
 
     // Thông báo
 

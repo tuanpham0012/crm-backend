@@ -24,4 +24,8 @@ class Projects extends Model
     public function ProjectParticipants(){
         return $this->hasMany('App\Models\ProjectParticipant', 'project_id', 'id');
     }
+
+    public function NoteOfProject(){
+        return $this->hasMany('App\Models\NoteOfProject', 'project_id', 'id')->latest();
+    }
 }

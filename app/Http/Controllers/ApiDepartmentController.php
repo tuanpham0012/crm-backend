@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Helper\Helper;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Models\StaffOfDepartment;
@@ -53,8 +54,11 @@ class ApiDepartmentController extends Controller
      */
     public function show($id)
     {
-        $staffs = StaffOfDepartment::with(['User', 'Departments', 'Position'])->where('department_id', $id)->get();
-        $user = User::with(['StaffOfDepartment.departments', 'StaffOfDepartment.position'])->orderBy('name', 'ASC')->get();
+        $staffs = StaffOfDepartment::with(['User', 'Departments', 'Position'])->where('department_id', $id)->orderBy('position_id')->get();
+        $user = User::with(['StaffOfDepartment.departments', 'StaffOfDepartment.position'])
+                ->whereDoesntHave('StaffOfDepartment', function($q) use($id){
+                    return $q->where('department_id', $id);
+                })->orderBy('name', 'ASC')->get();
         $department = Department::find($id);
 
         return response()->json(['staffs' => $staffs, 'department' => $department, 'all_user' => $user], 200);
@@ -102,7 +106,6 @@ class ApiDepartmentController extends Controller
     }
     public function add_staff(Request $request){
         $check = StaffOfDepartment::where('user_id', $request->user_id)->first();
-        $a = "";
         if($check){
             $check->department_id = $request->department_id;
             $check->position_id = $request->position_id;
@@ -112,13 +115,34 @@ class ApiDepartmentController extends Controller
             $department->fill($request->all());
             $department->save();
         }
+        $department = Department::find($request->department_id);
+        
+        $title = 'Phòng ban';
+        $content = "<span class='span-name'>".$request->user('api')->name ."</span> thêm bạn vào <span class='span-name'>". $department->name ."</span>"; 
+        $relation = "department";
+        $relation_id = $request->department_id;
+    
+        Helper::CreateNotification($title, $content, $request->user_id, $relation, $relation_id);
+
         return response()->json(['message'=> 'Thêm thành công!','a' => $check], 200);
     }
     public function update_position(Request $request, $id){
         $position = StaffOfDepartment::find($id);
-        $position->position_id = $request->position_id;
-        $position->save();
-        return response()->json(['message' => 'Cập nhật thành công'], 200);
+        if($position){
+            if($request->position_id == 1 || $request->position_id == 2){
+                $up = StaffOfDepartment::where('department_id', $position->department_id)->where('position_id', $request->position_id)->first();
+                if($up){
+                    $up->position_id = 3;
+                    $up->save();
+                }
+            }
+            $position->position_id = $request->position_id;
+            $position->save();
+            return response()->json(['message' => 'Cập nhật thành công'], 200);
+        }else{
+            return response()->json(['message' => 'Không tìm thấy thông tin'], 404);
+        }
+        
     }
     public function remove_staff($id){
         $position = StaffOfDepartment::find($id);

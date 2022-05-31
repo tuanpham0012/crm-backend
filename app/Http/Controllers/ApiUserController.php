@@ -38,21 +38,29 @@ class ApiUserController extends Controller
         }
     }
 
-    public function changePassword(ApiChangePasswordRequest $request){
+    public function changePassword(Request $request){
         $user = User::whereEmail($request->email)->first();
         if($user){
-            if(Hash::check($request->password, Auth::user()->password)){
+            if($request->role){
                 if($request->newPassword === $request->passwordConfirm){
                     $user->update(['password' => Hash::make($request->newPassword)]);  
-                    return response()->json(['message' => 'Đổi mật khẩu thành công!'], 200);
+                    return response()->json(['message' => 'Đổi mật khẩu thành công!', 'code' => '1'], 200);
                 }else{
-                    return response()->json(['message' => 'Đổi mật khẩu không thành công! Mật khẩu mới không trùng khớp!'], 401);
+                    return response()->json(['message' => 'Đổi mật khẩu không thành công! Mật khẩu mới không trùng khớp!', 'code' => '2'], 401);
+                }
+            }
+            else if(Hash::check($request->password, Auth::user()->password)){
+                if($request->newPassword === $request->passwordConfirm){
+                    $user->update(['password' => Hash::make($request->newPassword)]);  
+                    return response()->json(['message' => 'Đổi mật khẩu thành công!', 'code' => '1'], 200);
+                }else{
+                    return response()->json(['message' => 'Đổi mật khẩu không thành công! Mật khẩu mới không trùng khớp!', 'code' => '2'], 401);
                 }
             }else{
-                return response()->json(['message' => 'Sai mật khẩu!'], 401);
+                return response()->json(['message' => 'Sai mật khẩu!', 'code' => '3'], 401);
             }
         }else{
-            return response()->json(['message' => 'Không tìm thấy tài khoản!'], 401);
+            return response()->json(['message' => 'Không tìm thấy tài khoản!', 'code' => '0'], 404);
         }
         
     }
@@ -69,11 +77,11 @@ class ApiUserController extends Controller
     public function getDownload()
     {
     //PDF file is stored under project/public/download/info.pdf
-    $file= public_path(). "/downloads/DataCustomer.xlsx";
+        $file= public_path(). "/downloads/DataCustomer.xlsx";
 
-    $headers = [
-        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-     ];
+        $headers = [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ];
 
         return response()->download($file, 'DataCustomer.xlsx', $headers);
     }

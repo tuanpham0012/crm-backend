@@ -45,7 +45,7 @@ class TaskController extends Controller
         $task->task_status_id = 1;
         $task->save();
 
-        Helper::CreateNoteOfTask($task->id, $request->user('api')->id, 'Tạo mới công việc');
+        Helper::CreateNoteOfTask($task->id, $request->user('api')->id, "<span class='span-name'>".$request->user('api')->name .'</span> Tạo mới công việc');
 
         foreach ( $request->users as $user){
             $task_user = new TaskUser();
@@ -55,12 +55,17 @@ class TaskController extends Controller
                 $task_user->accept = 1;
             }
             $task_user->save();
+            if($task->user_id != $user['id']){
+                $title =  'Tạo mới công việc';
+                $content = "<span class='span-name'>".$request->user('api')->name .'</span> đã thêm bạn vào công việc';
 
-            $title =  'Tạo mới công việc';
-            $content = $request->user('api')->name .' đã thêm bạn vào công việc';
-
-            Helper::CreateNotification($title, $content, $user['id'], 'task', $task->id);
+                Helper::CreateNotification($title, $content, $user['id'], 'task', $task->id);
+            }
         }
+        // if($task->project_id){
+        //     $content = "<span class='span-name'>".$request->user('api')->name ."</span> đã tạo công việc mới: <span class='span-name'>".$task->name."</span>";
+        //     Helper::CreateNoteOfProject($request->task->project_id, $request->user('api')->id, $content);
+        // }
     
         return response()->json([ 'message' => 'Tạo công việc thành công!','task' => $task], 200);
     }

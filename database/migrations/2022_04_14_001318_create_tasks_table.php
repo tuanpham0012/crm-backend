@@ -24,7 +24,6 @@ class CreateTasksTable extends Migration
             $table->integer('customer_id')->nullable()->comment('Khách hàng liên quan');
             $table->integer('task_status_id');
             $table->integer('project_id')->nullable();
-            $table->boolean('finish')->default(0);
             $table->timestamps();
         });
     }

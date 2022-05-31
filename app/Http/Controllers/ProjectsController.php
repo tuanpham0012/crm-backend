@@ -22,8 +22,8 @@ class ProjectsController extends Controller
     public function __construct()
     {
         $date = new DateTime;
-        Projects::where('start_at', '<=', $date)->where( 'end_at', '>=', $date)->whereNotIn('project_status_id', [3, 4])->update(['project_status_id' => 2]);
-        Projects::where( 'end_at', '<', $date)->whereNotIn('project_status_id', [3, 4])->update(['project_status_id' => 3]);
+        Projects::where('start_at', '<=', $date)->where( 'end_at', '>=', $date)->whereNotIn('project_status_id', [4])->update(['project_status_id' => 2]);
+        Projects::where( 'end_at', '<', $date)->whereNotIn('project_status_id', [4])->update(['project_status_id' => 3]);
     }
 
     /**
@@ -99,6 +99,8 @@ class ProjectsController extends Controller
             Helper::CreateNotification($title, $content, $user['id'], 'project', $project->id);
         }
 
+        Helper::CreateNoteOfProject($project->id, $request->user('api')->id, 'Tạo mới dự án');
+
         return response()->json(['message' => 'Tạo mới thành công', 'project' => $project], 200);
     }
 
@@ -111,7 +113,7 @@ class ProjectsController extends Controller
     public function show($id)
     {
 
-        $project = Projects::with(['User:id,name', 'ProjectStatus', 'Tasks.User:id,name', 'Tasks.TypeOfTask', 'Tasks.TaskStatus', 'ProjectParticipants.User'])
+        $project = Projects::with(['User:id,name', 'ProjectStatus', 'Tasks.User:id,name', 'Tasks.TypeOfTask', 'Tasks.TaskStatus', 'ProjectParticipants.User', 'NoteOfProject.User:id,name,avatar'])
         ->find($id);
 
 

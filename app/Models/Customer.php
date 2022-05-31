@@ -8,7 +8,8 @@ class Customer extends Model
 {
     protected $table = "customers";
     protected $fillable = [
-        'customer_code', 'name', 'email', 'address', 'date_of_birth', 'gender','note', 'type_of_customer_id', 'user_id', 'deleted',
+        'customer_code', 'name', 'email', 'address', 'date_of_birth', 'zalo',
+         'gender','note', 'type_of_customer_id', 'user_id', 'contact_id', 'deleted',
     ];
 
 
@@ -19,7 +20,7 @@ class Customer extends Model
 
     public function Contacts()
     {
-        return $this->hasOne('App\Models\Contacts', 'customer_id', 'id');
+        return $this->belongsTo('App\User', 'contact_id', 'id');
     }
 
     public function CustomerNotes()
@@ -49,5 +50,8 @@ class Customer extends Model
 
     public function CallHistories(){
         return $this->hasMany('App\Models\CustomerCallHistory', 'customer_id', 'id')->latest();
+    }
+    public function CustomerReports(){
+        return $this->hasMany('App\Models\CustomerReports', 'customer_id', 'id')->latest();
     }
 }

@@ -24,6 +24,15 @@ use Maatwebsite\Excel\Facades\Excel;
 class ApiCustomerController extends Controller
 {
     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {;
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -32,7 +41,7 @@ class ApiCustomerController extends Controller
     {
         $pageSize = 20;
         $search = $request->search;
-        $customers = Customer::with(['CustomerPhone', 'TypeCustomer', 'Contacts.User', 'CustomerNotes.User', 'User'])
+        $customers = Customer::with(['CustomerPhone', 'TypeCustomer', 'Contacts:id,name', 'CustomerNotes.User:id,name', 'User:id,name'])
                 ->where(function($query) use ($search){
                     $query->where('name', 'like','%'.$search.'%')
                         ->orWhere('email', 'like', '%'.$search.'%');
@@ -43,7 +52,12 @@ class ApiCustomerController extends Controller
                     if($request->delete != -1) $q->where('deleted', $request->delete);
                 })
                 ->latest()->paginate($pageSize);
-        return response()->json([ 'customers' => $customers], 200);
+
+
+        $staffs = User::with('StaffOfDepartment')->whereHas('StaffOfDepartment', function($q){
+            return $q->where('department_id' , 2);
+        })->get();
+        return response()->json([ 'customers' => $customers, 'staffs' => $staffs], 200);
     }
 
     /**
@@ -70,8 +84,8 @@ class ApiCustomerController extends Controller
         ]);
         $customer = new Customer();
         $customer->fill($request->all());
-        $customer->customer_code = Str::orderedUuid();
-        $customer->status = 1;
+        $customer->customer_code = Str::random(8);
+        $customer->user_id = $request->user('api')->id;
         $customer->save();
         
         $phone = new CustomerPhone();
@@ -100,11 +114,12 @@ class ApiCustomerController extends Controller
     public function show($id)
     {
         $customer = Customer::with([
-            'CustomerPhone', 'TypeCustomer', 'Contacts.User','CustomerNotes.User', 
-            'Interest.TypeOfProduct', 'Tasks.User', 'Tasks.TaskStatus', 
+            'CustomerPhone', 'TypeCustomer', 'Contacts:id,name','CustomerNotes.User:id,name,avatar', 
+            'Interest.TypeOfProduct', 'Tasks.User:id,name', 'Tasks.TaskStatus', 
             'Tasks.TypeOfTask', 'Tasks.TaskUser',
-            'SendMailHistories.User',
-            'CallHistories.User'
+            'SendMailHistories.User:id,name',
+            'CallHistories.User:id,name',
+            'CustomerReports.User:id,name'
             ])->find($id);
         if($customer){
             return response()->json($customer, 200);
@@ -177,31 +192,31 @@ class ApiCustomerController extends Controller
                 foreach($request->listCustomer as $customer_id){
                     $customer = Customer::find($customer_id);
                     if($customer){
-                        $contact = Contacts::where('customer_id', $customer_id)->first();
-                        $title = 'Khách hàng';
-                        $content1 = "<span class='span-name'>".$request->user('api')->name ."</span> chỉ định bạn phụ trách khách hàng <span class='span-name'>".$customer->name."</span>"; 
-                        $relation = "customer";
-                        $relation_id = $customer_id;
-                        if(isset($contact)){
-                            if($request->update){
-                                $contact->user_id = $request->user_id;
-                                $contact->save();
+                        if(($customer->contact_id != null && $request->update) || $customer->contact_id == null){
+                            if(($customer->contact_id && $customer->contact_id != $request->user_id) || $customer->contact_id == null){
+                                $customer->contact_id = $request->user_id;
+                                $customer->save();
+                                $title = 'Khách hàng';
+                                $content1 = "<span class='span-name'>".$request->user('api')->name ."</span> chỉ định bạn phụ trách khách hàng <span class='span-name'>".$customer->name."</span>"; 
+                                $relation = "customer";
+                                $relation_id = $customer_id;
+    
+                                Helper::CreateNotification($title, $content1, $request->user_id,$relation, $relation_id);
+                                
+                                $content = "<span class='span-name'>". $request->user('api')->name ."</span> chỉ định <span class='span-name'>". $user->name ."</span> làm người phụ trách";
+                                Helper::CreateNoteOfCustomer($customer_id, $request->user('api')->id, $content);
                             }
-                        }else{
-                            $newCt = new Contacts;
-                            $newCt->user_id = $request->user_id;
-                            $newCt->customer_id = $customer_id;
-                            $newCt->save();
                         }
-                        Helper::CreateNotification($title, $content1, $request->user_id,$relation, $relation_id);
-                        
-                        $content = 'Gán <span class="span-name">'. $user->name .'</span> làm người phụ trách';
-                        Helper::CreateNoteOfCustomer($customer_id, $request->user('api')->id, $content);
                     }
-                    
                 }
             }
-        return response()->json(['message' => 'Cập nhật khách hàng thành công!', 'name' => $user->name], 200);
+            // if($request->file->hasFile('image')){
+            //     $fileName = $request->file->file('image')->getClientOriginalName();
+            // }else{
+            //     $fileName = 'as';
+            // }
+
+        return response()->json(['message' => 'Cập nhật khách hàng thành công!'], 200);
     }
 
     public function update_type(Request $request){
@@ -240,7 +255,7 @@ class ApiCustomerController extends Controller
     public function my_list_customer(Request $request){
         $pageSize = 20;
         $search = $request->search;
-        $customers = Customer::with(['CustomerPhone', 'TypeCustomer', 'Contacts.User', 'CustomerNotes.User', 'User'])
+        $customers = Customer::with(['CustomerPhone', 'TypeCustomer', 'Contacts', 'CustomerNotes.User', 'User'])
                 ->where(function($query) use ($search){
                     $query->where('name', 'like','%'.$search.'%')
                         ->orWhere('email', 'like', '%'.$search.'%');
@@ -249,9 +264,7 @@ class ApiCustomerController extends Controller
                 })
                 ->where(function($q) use($request){
                     if($request->delete != -1) $q->where('deleted', $request->delete);
-                })->whereHas('Contacts', function($q) use($request){
-                    return $q->where('user_id', $request->user('api')->id);
-                })
+                })->where('contact_id',  $request->user('api')->id)
                 ->latest()->paginate($pageSize);
 
         return response()->json([ 'customers' => $customers], 200);

@@ -113,8 +113,10 @@ class StaffController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $staff = User::find($id)->update($request->all());
+        $staff = User::find($id);
         if($staff){
+            $staff->fill($request->all());
+            $staff->save();
             return response()->json(['message' => 'Cập nhật thông tin thành công!', 'user' => $staff], 200);
         }else{
             return response()->json(['message' => 'Không tìm thấy thông tin!'], 404);
@@ -159,5 +161,22 @@ class StaffController extends Controller
 
         }
         return response()->json(['message' => 'Cập nhật thành công!'], 200);
+    }
+
+    public function update_avatar(Request $request, $id){
+        $staff = User::find($id);
+        if($staff){
+            if($request->hasFile('avatar')){
+                $fileNameWithExt = $request->file('avatar')->getClientOriginalName();
+                $fileName = pathinfo($fileNameWithExt, PATHINFO_FILENAME);
+                $extension = $request->file('avatar')->getClientOriginalExtension();
+                $fileNameToStoge = time().'_'.$fileName. '.' .$extension;
+
+                $path = $request->file('avatar')->storeAs('public/images', $fileNameToStoge);
+                $staff->avatar = $fileNameToStoge;
+                $staff->save();
+            }
+            return response()->json(['message' => 'Cập nhật thông tin thành công!', 'user' => $staff], 200);
+        }
     }
 }

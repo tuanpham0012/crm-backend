@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CustomerReports;
+use App\Helper\Helper;
 use Illuminate\Http\Request;
+use App\Models\NoteOfProject;
 
-class CustomerReportsController extends Controller
+class NoteOfProjectController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -35,21 +36,18 @@ class CustomerReportsController extends Controller
      */
     public function store(Request $request)
     {
-        $care = new CustomerReports();
-        $care->fill($request->all());
-        $care->user_id = $request->user('api')->id;
-        $care->save();
-
-        return response()->json(['message' => 'Tạo thành công!','care' => $care], 200);
+        $creater_id = $request->user('api')->id;
+        $note = Helper::CreateNoteOfProject($request->project_id, $creater_id, $request->content);
+        return response()->json(['message' => 'Success!', 'res' => $note], 200);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\CustomerReports  $customerReports
+     * @param  \App\Modals\NoteOfProject  $noteOfProject
      * @return \Illuminate\Http\Response
      */
-    public function show(CustomerReports $customerReports)
+    public function show($id)
     {
         //
     }
@@ -57,10 +55,10 @@ class CustomerReportsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\CustomerReports  $customerReports
+     * @param  \App\Modals\NoteOfProject  $noteOfProject
      * @return \Illuminate\Http\Response
      */
-    public function edit(CustomerReports $customerReports)
+    public function edit($id)
     {
         //
     }
@@ -69,23 +67,30 @@ class CustomerReportsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CustomerReports  $customerReports
+     * @param  \App\Modals\NoteOfProject  $noteOfProject
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $care = CustomerReports::find($id)->update($request->all());
-        return response()->json(['message' => 'Cập nhật thành công!'], 200);
+        $note = NoteOfProject::find($id);
+        $note->content = $request->content;
+        $note->save();
+        return response()->json(['message' => 'Chỉnh sửa thành công!', 'note' => $note], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\CustomerReports  $customerReports
+     * @param  \App\Modals\NoteOfProject  $noteOfProject
      * @return \Illuminate\Http\Response
      */
-    public function destroy(CustomerReports $customerReports)
+    public function destroy($id)
     {
-        //
+        $note = NoteOfProject::find($id)->delete();
+        if($note){
+            return response()->json(['message' => 'Xóa thành công!'], 200);
+        }else{
+            return response()->json(['message' => 'Không tìm thấy bản ghi!'], 404);
+        }
     }
 }

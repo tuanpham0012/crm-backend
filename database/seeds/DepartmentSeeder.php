@@ -13,25 +13,13 @@ class DepartmentSeeder extends Seeder
     public function run(){
         DB::table('departments')->insert([
             [
-                'code_department' => 'PBQL',
-                'name' => 'Phòng quản lý'
-            ],
-            [
                 'code_department' => 'PBSL',
                 'name' => 'Phòng nhân sự'
-            ],
-            [
-                'code_department' => 'PPMK',
-                'name' => 'Phòng kế toán'
             ],
             [
                 'code_department' => 'PPCS',
                 'name' => 'Phòng chăm sóc khách hàng'
             ],
-            [
-                'code_department' => 'PPKD',
-                'name' => 'Phòng kinh doanh'
-            ]
         ]);
     }
 }

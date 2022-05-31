@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 $factory->define(Customer::class, function (Faker $faker) {
     return [
-        'customer_code' => Str::random(10),
+        'customer_code' => Str::random(8),
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
         'address' => $faker->address,

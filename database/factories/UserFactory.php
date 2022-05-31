@@ -30,7 +30,7 @@ $factory->define(User::class, function (Faker $faker) {
         'gender' => 'Nam',
         'status' => '',
         'password' => Hash::make('admin123'),
-        'role_id' => 3, //Role::query()->inRandomOrder()->value('id')
+        'role_id' => 2, //Role::query()->inRandomOrder()->value('id')
         'created_at' => new DateTime,
         'updated_at' => new DateTime,
         'remember_token' => Str::random(10),

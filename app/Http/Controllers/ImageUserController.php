@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CustomerReports;
+use App\Modals\ImageUser;
 use Illuminate\Http\Request;
 
-class CustomerReportsController extends Controller
+class ImageUserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -35,21 +35,16 @@ class CustomerReportsController extends Controller
      */
     public function store(Request $request)
     {
-        $care = new CustomerReports();
-        $care->fill($request->all());
-        $care->user_id = $request->user('api')->id;
-        $care->save();
-
-        return response()->json(['message' => 'Tạo thành công!','care' => $care], 200);
+        //
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\CustomerReports  $customerReports
+     * @param  \App\Modals\ImageUser  $imageUser
      * @return \Illuminate\Http\Response
      */
-    public function show(CustomerReports $customerReports)
+    public function show(ImageUser $imageUser)
     {
         //
     }
@@ -57,10 +52,10 @@ class CustomerReportsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\CustomerReports  $customerReports
+     * @param  \App\Modals\ImageUser  $imageUser
      * @return \Illuminate\Http\Response
      */
-    public function edit(CustomerReports $customerReports)
+    public function edit(ImageUser $imageUser)
     {
         //
     }
@@ -69,22 +64,21 @@ class CustomerReportsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CustomerReports  $customerReports
+     * @param  \App\Modals\ImageUser  $imageUser
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, ImageUser $imageUser)
     {
-        $care = CustomerReports::find($id)->update($request->all());
-        return response()->json(['message' => 'Cập nhật thành công!'], 200);
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\CustomerReports  $customerReports
+     * @param  \App\Modals\ImageUser  $imageUser
      * @return \Illuminate\Http\Response
      */
-    public function destroy(CustomerReports $customerReports)
+    public function destroy(ImageUser $imageUser)
     {
         //
     }
